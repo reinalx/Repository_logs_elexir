@@ -1,6 +1,5 @@
-<<<<<<< HEAD
+
 # Repositoy of Logs
-=======
 This project was developed as part of a university assignment, involving collaboration among multiple individuals. It focuses on creating a system that gathers logs from diverse machines, enabling users to query and filter these logs. Additionally, users can subscribe to specific individuals to receive real-time logs. The architecture is implemented using the Elixir language with a repository pattern. Moreover, a frontend has been crafted utilizing the Phoenix framework and Tailwind CSS for styling
 # Práctica grupal
 
