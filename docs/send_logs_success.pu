@@ -1,0 +1,27 @@
+@startuml send_logs_error
+actor Client
+entity SyslogReader
+entity Repository
+database DataBase
+
+Client -> SyslogReader : start_link()
+SyslogReader -> SyslogReader : init()
+SyslogReader -> Repository : new_connection()
+Repository -> DataBase : retrieve_db()
+DataBase --> Repository : db_state
+Repository --> SyslogReader : :ok
+SyslogReader -> SyslogReader : initialize()
+SyslogReader -> SyslogReader : poll()
+loop every @poll_interval
+    SyslogReader -> SyslogReader : handle_info(:read_log_lines)
+    SyslogReader -> SyslogReader : read_til_eof(fp)
+    SyslogReader -> SyslogReader : format_logs(logs)
+    SyslogReader -> Repository : insert_logs(name, logs)
+    Repository --> SyslogReader : :ok
+    SyslogReader -> SyslogReader : poll()
+end
+loop every @save_logs_time
+    DataBase -> Repository: send_all_logs_raw()
+    Repository --> DataBase: raw_logs
+end
+@enduml

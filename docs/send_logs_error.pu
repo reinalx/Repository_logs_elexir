@@ -1,0 +1,37 @@
+@startuml send_logs_error
+actor Client
+entity SyslogReader
+entity Repository
+database DataBase
+
+Client -> SyslogReader : start_link()
+SyslogReader -> SyslogReader : init()
+SyslogReader -> Repository : new_connection()
+alt successful connection
+    Repository -> DataBase : retrieve_db()
+    DataBase --> Repository : db_state
+    Repository --> SyslogReader : :ok
+    SyslogReader -> SyslogReader : initialize()
+else already connected
+    Repository --> SyslogReader : :already_connected
+    SyslogReader -> SyslogReader : handle_already_connected()
+    SyslogReader -> SyslogReader : stop()
+else error in connection
+    Repository --> SyslogReader : {:error, reason}
+    SyslogReader -> SyslogReader : handle_error()
+    SyslogReader -> SyslogReader : raise "Error connecting to repository"
+end
+SyslogReader -> SyslogReader : poll()
+loop every @poll_interval
+    SyslogReader -> SyslogReader : handle_info(:read_log_lines)
+    SyslogReader -> SyslogReader : read_til_eof(fp)
+    alt successful read
+        SyslogReader -> SyslogReader : format_logs(logs)
+        SyslogReader -> Repository : insert_logs(name, logs)
+        Repository --> SyslogReader : :ok
+    else invalid log format
+        SyslogReader -> SyslogReader : raise "Invalid log format"
+    end
+    SyslogReader -> SyslogReader : poll()
+end
+@enduml

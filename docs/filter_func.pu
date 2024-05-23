@@ -1,0 +1,28 @@
+@startuml filter_func
+
+entity Frontend
+entity Filters
+entity Repository
+
+Frontend-> Filters: send_logs(minutes, users)
+Filters -> Repository: send_logs(minutes, users)
+Repository --> Filters: logs_list
+Filters --> Frontend: logs_list
+
+Frontend -> Filters: send_all_logs()
+Filters -> Repository: send_all_logs()
+Repository --> Filters: logs_list
+Filters --> Frontend: logs_list
+
+Frontend-> Filters: filter_keywords(keywords)
+Filters -> Filters: keywords_filter(last_log, keywords)
+Filters --> Frontend: filtered_logs
+
+Frontend-> Filters: filter_service(service)
+Filters -> Filters: service_filter(last_log, service)
+Filters --> Frontend: filtered_logs
+
+Frontend-> Filters: filter_redo()
+Filters --> Frontend: previous_logs
+
+@enduml

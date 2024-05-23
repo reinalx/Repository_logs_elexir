@@ -1,0 +1,23 @@
+@startuml subscirbe & get_logs
+
+entity Frontend
+entity SubscriptionManagerG
+entity Repository
+
+Frontend -> SubscriptionManagerG: send_users()
+SubscriptionManagerG -> Repository: send_user_list()
+Repository --> SubscriptionManagerG: all_users_list
+SubscriptionManagerG --> Frontend: all_users_list
+
+Frontend-> SubscriptionManagerG: subscribe(user_list, pid)
+SubscriptionManagerG -> SubscriptionManagerG: handle_cast({:subscribe, {pid, user_list}}, state)
+
+
+loop Every @poll_time
+    SubscriptionManagerG -> Repository: send_logs(minutes, users_to_get)
+    Repository --> SubscriptionManagerG: logs
+    SubscriptionManagerG -> SubscriptionManagerG: response(state, logs)
+    SubscriptionManagerG --> Frontend: {:response, new_logs}
+end
+
+@enduml
